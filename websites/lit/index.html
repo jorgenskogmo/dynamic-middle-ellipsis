@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Middle Ellipsis - Lit Web Component Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: white;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      opacity: 0.9;
+    }
+
+    .badges {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .demo-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .demo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .demo-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .demo-card p {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .demo-content {
+      border: 2px dashed #e5e7eb;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f9fafb;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+    }
+
+    .demo-content.narrow {
+      max-width: 250px;
+    }
+
+    .demo-content.medium {
+      max-width: 400px;
+    }
+
+    .demo-content.wide {
+      max-width: 100%;
+    }
+
+    .demo-content.resizable {
+      resize: horizontal;
+      overflow: auto;
+      border-color: #667eea;
+      border-style: solid;
+      min-width: 200px;
+      cursor: ew-resize;
+    }
+
+    middle-ellipsis {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #1f2937;
+    }
+
+    .full-width-demo {
+      grid-column: 1 / -1;
+    }
+
+    .resizable-hint {
+      font-size: 0.75rem;
+      color: #667eea;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+    }
+
+    .feature-list li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: white;
+      opacity: 0.8;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 Dynamic Middle Ellipsis</h1>
+      <p class="subtitle">Lit Web Component Demo</p>
+      <div class="badges">
+        <span class="badge">Framework-agnostic</span>
+        <span class="badge">Web Components</span>
+        <span class="badge">TypeScript</span>
+        <span class="badge">Responsive</span>
+      </div>
+      
+      <ul class="feature-list">
+        <li>Smart middle truncation preserving start and end</li>
+        <li>Automatically adapts to container width changes</li>
+        <li>Font-aware calculations for pixel-perfect results</li>
+        <li>Multi-line support with configurable line limits</li>
+        <li>Custom ellipsis symbols</li>
+        <li>Works with any framework or vanilla JS</li>
+      </ul>
+    </header>
+
+    <div class="demo-grid">
+      <!-- Basic Usage -->
+      <div class="demo-card">
+        <h2>Basic Usage</h2>
+        <p>Default ellipsis symbol (...) with single line truncation</p>
+        <div class="demo-content narrow">
+          <middle-ellipsis>
+            Very long file name that needs truncation because it is way too long to display.pdf
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- Custom Ellipsis Symbol -->
+      <div class="demo-card">
+        <h2>Custom Ellipsis</h2>
+        <p>Using a custom ellipsis symbol: <code>[---]</code></p>
+        <div class="demo-content narrow">
+          <middle-ellipsis ellipsis-symbol="[---]">
+            Very long file name that needs truncation because it is way too long to display.pdf
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- Short Text (No Truncation) -->
+      <div class="demo-card">
+        <h2>Short Text</h2>
+        <p>Short text is displayed in full without truncation</p>
+        <div class="demo-content wide">
+          <middle-ellipsis>
+            Short.pdf
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- Multi-line Support (2 lines) -->
+      <div class="demo-card">
+        <h2>Multi-line (2 lines)</h2>
+        <p>Text wraps to 2 lines before truncating: <code>line-limit="2"</code></p>
+        <div class="demo-content medium">
+          <middle-ellipsis line-limit="2">
+            This is a very long text that should wrap to multiple lines before it starts truncating in the middle. This demonstrates the line-limit feature of the component.
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- Multi-line Support (3 lines) -->
+      <div class="demo-card">
+        <h2>Multi-line (3 lines)</h2>
+        <p>Text wraps to 3 lines before truncating: <code>line-limit="3"</code></p>
+        <div class="demo-content medium">
+          <middle-ellipsis line-limit="3">
+            This is an even longer text that should wrap to three lines before it starts truncating in the middle. This demonstrates how the component handles multiple lines of text gracefully and only truncates when absolutely necessary to fit the content.
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- Combined Features -->
+      <div class="demo-card">
+        <h2>Combined Features</h2>
+        <p>Custom symbol + multi-line: <code>ellipsis-symbol="(...)" line-limit="2"</code></p>
+        <div class="demo-content medium">
+          <middle-ellipsis ellipsis-symbol="(...)" line-limit="2">
+            This text combines both features: a custom ellipsis symbol and multi-line support to show that all attributes work together properly and seamlessly.
+          </middle-ellipsis>
+        </div>
+      </div>
+
+      <!-- File Path Example -->
+      <div class="demo-card full-width-demo">
+        <h2>File Path Examples</h2>
+        <p>Same file path in different container widths - see how truncation adapts</p>
+        
+        <div style="margin-bottom: 1rem;">
+          <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Narrow (250px)</p>
+          <div class="demo-content narrow">
+            <middle-ellipsis>
+              /Users/username/Documents/Projects/my-awesome-project/src/components/VeryLongComponentName.tsx
+            </middle-ellipsis>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Medium (400px)</p>
+          <div class="demo-content medium">
+            <middle-ellipsis>
+              /Users/username/Documents/Projects/my-awesome-project/src/components/VeryLongComponentName.tsx
+            </middle-ellipsis>
+          </div>
+        </div>
+
+        <div>
+          <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">Wide (100%)</p>
+          <div class="demo-content wide">
+            <middle-ellipsis>
+              /Users/username/Documents/Projects/my-awesome-project/src/components/VeryLongComponentName.tsx
+            </middle-ellipsis>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resizable Container -->
+      <div class="demo-card full-width-demo">
+        <h2>🎯 Interactive Resize Demo</h2>
+        <p>Drag the right edge of the container to see dynamic truncation in action!</p>
+        <div class="demo-content resizable">
+          <middle-ellipsis>
+            Drag the container edge to see how the truncation adapts dynamically and responsively to any width changes.pdf
+          </middle-ellipsis>
+        </div>
+        <p class="resizable-hint">👆 Grab the right edge and drag to resize</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        Made with Lit Web Components | 
+        <a href="https://github.com/LalitSinghRana/dynamic-middle-ellipsis" target="_blank">GitHub</a> | 
+        <a href="https://www.npmjs.com/package/@dynamic-middle-ellipsis/lit" target="_blank">NPM</a>
+      </p>
+    </footer>
+  </div>
+
+  <script type="module">
+    // Import the Lit web component
+    import '@dynamic-middle-ellipsis/lit';
+    
+    console.log('✅ Middle Ellipsis Lit component loaded successfully!');
+    
+    // Log component information when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const elements = document.querySelectorAll('middle-ellipsis');
+      console.log(`Found ${elements.length} middle-ellipsis elements on the page`);
+      
+      // Log each element's configuration
+      elements.forEach((el, index) => {
+        console.log(`Element ${index + 1}:`, {
+          text: el.textContent?.trim().substring(0, 50) + '...',
+          ellipsisSymbol: el.getAttribute('ellipsis-symbol') || '...',
+          lineLimit: el.getAttribute('line-limit') || '1'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
