@@ -44,7 +44,7 @@ export class MiddleEllipsis extends LitElement {
 	 */
 	config?: MiddleEllipsisConfig;
 
-	private truncateOnResize = createMiddleEllipsisUtils(this.config);
+	private truncateOnResize?: ReturnType<typeof createMiddleEllipsisUtils>;
 	private cleanup?: () => void;
 	private spanElement?: HTMLSpanElement;
 	private originalText = "";
@@ -58,6 +58,8 @@ export class MiddleEllipsis extends LitElement {
 		super.connectedCallback();
 		// Capture the original text content from the slot before rendering
 		this.originalText = this.textContent?.trim() || "";
+		// Initialize truncateOnResize with config if provided
+		this.truncateOnResize = createMiddleEllipsisUtils(this.config);
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -88,7 +90,7 @@ export class MiddleEllipsis extends LitElement {
 
 		// Find the span element we rendered
 		this.spanElement = this.querySelector("span") as HTMLSpanElement;
-		if (!this.spanElement) return;
+		if (!this.spanElement || !this.truncateOnResize) return;
 
 		// Setup truncation with the original text
 		this.cleanup = this.truncateOnResize({

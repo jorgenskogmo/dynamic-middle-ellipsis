@@ -1,6 +1,6 @@
 {
 	"name": "@dynamic-middle-ellipsis/lit",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"type": "module",
 	"description": "Lit web component for dynamic text truncation with middle ellipsis",
 	"author": "Lalit Rana",
