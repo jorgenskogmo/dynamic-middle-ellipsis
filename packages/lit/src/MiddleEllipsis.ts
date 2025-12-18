@@ -47,10 +47,17 @@ export class MiddleEllipsis extends LitElement {
 	private truncateOnResize = createMiddleEllipsisUtils(this.config);
 	private cleanup?: () => void;
 	private spanElement?: HTMLSpanElement;
+	private originalText = "";
 
 	// Disable shadow DOM to allow proper text measurement
 	protected createRenderRoot() {
 		return this;
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		// Capture the original text content from the slot before rendering
+		this.originalText = this.textContent?.trim() || "";
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -79,17 +86,14 @@ export class MiddleEllipsis extends LitElement {
 		// Clean up previous observer
 		this.cleanup?.();
 
-		// Find the span element
+		// Find the span element we rendered
 		this.spanElement = this.querySelector("span") as HTMLSpanElement;
 		if (!this.spanElement) return;
 
-		// Get the original text from the slot
-		const originalText = this.textContent?.trim() || "";
-
-		// Setup truncation
+		// Setup truncation with the original text
 		this.cleanup = this.truncateOnResize({
 			targetElement: this.spanElement,
-			originalText,
+			originalText: this.originalText,
 			ellipsisSymbol: this.ellipsisSymbol,
 			lineLimit: this.lineLimit,
 		});
@@ -98,7 +102,7 @@ export class MiddleEllipsis extends LitElement {
 	protected render() {
 		return html`<span
 			style="word-break: break-all;"
-			aria-label="${this.textContent?.trim() || ""}"
+			aria-label="${this.originalText}"
 			>\u00A0</span
 		>`;
 	}
