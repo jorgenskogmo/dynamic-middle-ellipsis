@@ -2,6 +2,7 @@
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/LalitSinghRana/dynamic-middle-ellipsis)](https://github.com/LalitSinghRana/dynamic-middle-ellipsis.git)
 [![NPM React](https://img.shields.io/npm/v/@dynamic-middle-ellipsis/react?label=@dynamic-middle-ellipsis/react)](https://www.npmjs.com/package/@dynamic-middle-ellipsis/react)
+[![NPM Lit](https://img.shields.io/npm/v/@dynamic-middle-ellipsis/lit?label=@dynamic-middle-ellipsis/lit)](https://www.npmjs.com/package/@dynamic-middle-ellipsis/lit)
 [![NPM Core](https://img.shields.io/npm/v/@dynamic-middle-ellipsis/core?label=@dynamic-middle-ellipsis/core)](https://www.npmjs.com/package/@dynamic-middle-ellipsis/core)
 
 Dynamically truncate long text in the middle for multiple frameworks. Preserves the most important parts of your text with smart, responsive, and pixel-perfect text truncation.
@@ -31,6 +32,25 @@ const MiddleEllipsis = createMiddleEllipsis();
 <MiddleEllipsis.Span>
   This text will truncate in the middle when space is limited
 </MiddleEllipsis.Span>
+```
+
+### 🔗 [Lit](./packages/lit) 
+[![NPM Lit](https://img.shields.io/npm/v/@dynamic-middle-ellipsis/lit?label=@dynamic-middle-ellipsis/lit)](https://www.npmjs.com/package/@dynamic-middle-ellipsis/lit)
+
+Web component for any framework or vanilla JS.
+
+```bash
+npm install @dynamic-middle-ellipsis/lit
+```
+
+```html
+<script type="module">
+  import '@dynamic-middle-ellipsis/lit';
+</script>
+
+<middle-ellipsis>
+  This text will truncate in the middle when space is limited
+</middle-ellipsis>
 ```
 
 ### 🔗 [Core](./packages/core) 
