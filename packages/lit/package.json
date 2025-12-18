@@ -1,0 +1,61 @@
+{
+	"name": "@dynamic-middle-ellipsis/lit",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "Lit web component for dynamic text truncation with middle ellipsis",
+	"author": "Lalit Rana",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/LalitSinghRana/dynamic-middle-ellipsis.git",
+		"directory": "packages/lit"
+	},
+	"bugs": {
+		"url": "https://github.com/LalitSinghRana/dynamic-middle-ellipsis/issues"
+	},
+	"homepage": "https://github.com/LalitSinghRana/dynamic-middle-ellipsis/tree/main/packages/lit#readme",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist/",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc",
+		"clean": "rm -rf dist",
+		"prepublishOnly": "pnpm clean && pnpm build && npm pack --dry-run"
+	},
+	"keywords": [
+		"text",
+		"ellipsis",
+		"truncate",
+		"middle",
+		"center",
+		"text-overflow",
+		"component",
+		"web-component",
+		"typescript",
+		"lit",
+		"lit-element"
+	],
+	"dependencies": {
+		"@dynamic-middle-ellipsis/core": "1.0.2",
+		"lit": "^3.0.0"
+	},
+	"devDependencies": {
+		"typescript": "5.9.2"
+	},
+	"engines": {
+		"node": ">=16.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
