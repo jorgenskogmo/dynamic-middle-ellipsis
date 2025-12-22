@@ -6,19 +6,13 @@
 	"author": "Lalit Rana",
 	"license": "MIT",
 	"scripts": {
-		"build": "pnpm -r --filter \"./packages/*\" build",
-		"check": "biome check . --write",
-		"dev": "pnpm --filter \"./websites/*\" dev"
+		"dev": "vite dev"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.6"
+		"@biomejs/biome": "2.0.6",
+		"vite": "^7.3.0"
 	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@biomejs/biome"
-		]
-	},
-	"engines": {
-		"node": ">=16.0.0"
+	"dependencies": {
+		"lit": "^3.3.1"
 	}
 }
