@@ -116,11 +116,16 @@
             </middle-ellipsis>
         </div>
 
+        <br />
+
         <div class="container container-50">
             <middle-ellipsis ellipsis-symbol=" ⟷ ">
                 user@example.com/documents/work/presentations/q4-2024/sales-report-final-reviewed-approved.pdf
             </middle-ellipsis>
         </div>
+
+        <br />
+
 
         <div class="container container-50">
             <middle-ellipsis ellipsis-symbol=" 🔗 ">
@@ -140,6 +145,14 @@
             </middle-ellipsis>
         </div>
 
+        <div class="code-block">
+            &lt;middle-ellipsis line-limit="2"&gt;
+            This is a much longer piece of text that demonstrates the multi-line truncation feature. The text will wrap to multiple lines and still truncate in the middle when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or file paths in a user interface.
+            &lt;/middle-ellipsis&gt;
+        </div>
+
+        <br />
+
         <div class="container container-50">
             <middle-ellipsis line-limit="3" ellipsis-symbol=" [...] ">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
@@ -147,10 +160,6 @@
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis line-limit="2"&gt;
-            This is a much longer piece of text that demonstrates the multi-line truncation feature. The text will wrap to multiple lines and still truncate in the middle when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or file paths in a user interface.
-            &lt;/middle-ellipsis&gt;
-
             &lt;middle-ellipsis line-limit="3" ellipsis-symbol=" [...] "&gt;
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
             &lt;/middle-ellipsis&gt;
@@ -173,7 +182,7 @@
     <div class="demo-section">
         <h2>6. Narrow Containers</h2>
         <p>The component handles very narrow containers gracefully.</p>
-        <div class="container container-30">
+        <div class="container" style="width: 30%">
             <middle-ellipsis>
                 SuperLongFileNameWithoutSpaces_v2_final_FINAL_approved.docx
             </middle-ellipsis>

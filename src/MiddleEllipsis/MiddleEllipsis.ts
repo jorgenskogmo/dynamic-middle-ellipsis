@@ -1,10 +1,10 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import createMiddleEllipsisUtils from "./core/index";
 import { generateCharacterWidthMapping } from "./core/font-width-generator";
+import createMiddleEllipsisUtils from "./core/index";
 import {
-	enableDebugMode,
 	disableDebugMode,
+	enableDebugMode,
 	setForceCanvasMode,
 } from "./core/string-utils";
 
@@ -13,33 +13,33 @@ import {
  *
  * @slot - Default slot for text content to be truncated
  *
- * @example
- * \`\`\`html
+ * @example Basic usage
+ * ```html
  * <middle-ellipsis>
  *   This is a very long text that will be truncated in the middle
  * </middle-ellipsis>
- * \`\`\`
+ * ```
  *
- * @example
- * \`\`\`html
+ * @example Custom ellipsis symbol with multi-line support
+ * ```html
  * <middle-ellipsis ellipsis-symbol="[...]" line-limit="2">
  *   Multi-line text with custom ellipsis
  * </middle-ellipsis>
- * \`\`\`
+ * ```
  *
- * @example
- * \`\`\`html
+ * @example Debug mode to generate font width mappings
+ * ```html
  * <middle-ellipsis debug-font-mapping>
  *   Text to analyze font mapping
  * </middle-ellipsis>
- * \`\`\`
+ * ```
  *
- * @example
- * \`\`\`html
+ * @example Force Canvas mode for pixel-perfect measurements
+ * ```html
  * <middle-ellipsis force-canvas>
  *   Use Canvas measureText for pixel-perfect accuracy
  * </middle-ellipsis>
- * \`\`\`
+ * ```
  */
 @customElement("middle-ellipsis")
 export class MiddleEllipsis extends LitElement {
@@ -48,13 +48,6 @@ export class MiddleEllipsis extends LitElement {
 			display: block;
 			max-width: 100%;
 			box-sizing: border-box;
-			outline: 2px solid #f00;
-		}
-		
-		.wrapper {
-			width: 100%;
-			box-sizing: border-box;
-			outline: 1px solid #0f0;
 		}
 		
 		.content {
@@ -80,9 +73,6 @@ export class MiddleEllipsis extends LitElement {
 
 	@property({ type: Boolean, attribute: "force-canvas" })
 	forceCanvas = false;
-
-	@query(".wrapper")
-	private wrapperElement!: HTMLDivElement;
 
 	@query(".content")
 	private contentElement!: HTMLDivElement;
@@ -176,9 +166,7 @@ export class MiddleEllipsis extends LitElement {
 	render() {
 		const classes = this.lineLimit > 1 ? "content multiline" : "content";
 		return html`
-			<div class="wrapper">
-				<div class=${classes}></div>
-			</div>
+			<div class=${classes}></div>
 			<slot @slotchange=${this.handleSlotChange} style="display: none;"></slot>
 		`;
 	}
