@@ -40,7 +40,14 @@ export class MiddleEllipsis extends LitElement {
 			word-wrap: break-word;
 			overflow: hidden;
 		}
+
+		.content.end-mode {
+			text-overflow: ellipsis;
+		}
 	`;
+
+	@property({ type: String })
+	variant: "middle" | "end" = "middle";
 
 	@property({ type: String, attribute: "ellipsis-symbol" })
 	ellipsisSymbol = "…";
@@ -73,6 +80,19 @@ export class MiddleEllipsis extends LitElement {
 	private setupTruncation() {
 		if (!this.contentElement || !this.slotContent) return;
 
+		if (this.variant === "end") {
+			this.setupEndTruncation();
+		} else {
+			this.setupMiddleTruncation();
+		}
+	}
+
+	private setupEndTruncation() {
+		// For end mode, just set the text and let CSS handle truncation
+		this.contentElement.textContent = this.slotContent;
+	}
+
+	private setupMiddleTruncation() {
 		const truncateOnResize = createMiddleEllipsisUtils();
 
 		this.cleanupTruncate = truncateOnResize({
@@ -94,7 +114,8 @@ export class MiddleEllipsis extends LitElement {
 	protected updated(changedProperties: Map<string, unknown>) {
 		if (
 			changedProperties.has("ellipsisSymbol") ||
-			changedProperties.has("lineLimit")
+			changedProperties.has("lineLimit") ||
+			changedProperties.has("variant")
 		) {
 			this.cleanupTruncate?.();
 			this.setupTruncation();
@@ -102,9 +123,27 @@ export class MiddleEllipsis extends LitElement {
 	}
 
 	render() {
-		const classes = this.lineLimit > 1 ? "content multiline" : "content";
+		const isMultiline = this.lineLimit > 1;
+		const isEndMode = this.variant === "end";
+
+		// Build class list
+		const classList = ["content"];
+		if (isMultiline) {
+			classList.push("multiline");
+		}
+		if (isEndMode) {
+			classList.push("end-mode");
+		}
+		const classes = classList.join(" ");
+
+		// For end mode with line-limit, use CSS line-clamp
+		let style = "";
+		if (isEndMode && isMultiline) {
+			style = `display: -webkit-box; -webkit-line-clamp: ${this.lineLimit}; -webkit-box-orient: vertical; overflow: hidden;`;
+		}
+
 		return html`
-			<div class=${classes}></div>
+			<div class=${classes} style=${style}></div>
 			<slot @slotchange=${this.handleSlotChange} style="display: none;"></slot>
 		`;
 	}
