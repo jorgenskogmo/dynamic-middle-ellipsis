@@ -39,10 +39,18 @@ export class MiddleEllipsis extends LitElement {
 			white-space: normal;
 			word-wrap: break-word;
 			overflow: hidden;
+			display: block;
 		}
 
 		.content.end-mode {
 			text-overflow: ellipsis;
+		}
+
+		.content.end-mode.multiline {
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 	`;
 
@@ -80,6 +88,31 @@ export class MiddleEllipsis extends LitElement {
 	private setupTruncation() {
 		if (!this.contentElement || !this.slotContent) return;
 
+		// Set max-height for multiline
+		if (this.lineLimit > 1) {
+			const computedStyle = window.getComputedStyle(this.contentElement);
+			let lineHeight = parseFloat(computedStyle.lineHeight);
+
+			// If lineHeight is "normal" or NaN, calculate it from fontSize
+			if (isNaN(lineHeight)) {
+				const fontSize = parseFloat(computedStyle.fontSize);
+				lineHeight = fontSize * 1.2; // Typical "normal" line-height
+			}
+
+			const maxHeight = lineHeight * this.lineLimit;
+			this.contentElement.style.maxHeight = `${maxHeight}px`;
+
+			// For end mode, use -webkit-line-clamp
+			if (this.variant === "end") {
+				this.contentElement.style.webkitLineClamp = String(this.lineLimit);
+			} else {
+				this.contentElement.style.webkitLineClamp = "";
+			}
+		} else {
+			this.contentElement.style.maxHeight = "";
+			this.contentElement.style.webkitLineClamp = "";
+		}
+
 		if (this.variant === "end") {
 			this.setupEndTruncation();
 		} else {
@@ -95,6 +128,8 @@ export class MiddleEllipsis extends LitElement {
 	private setupMiddleTruncation() {
 		const truncateOnResize = createMiddleEllipsisUtils();
 
+		// For multiline middle mode, we need to check scrollHeight vs clientHeight
+		// instead of just scrollWidth vs clientWidth
 		this.cleanupTruncate = truncateOnResize({
 			boundingElement: this as unknown as HTMLElement,
 			targetElement: this.contentElement,
@@ -136,14 +171,8 @@ export class MiddleEllipsis extends LitElement {
 		}
 		const classes = classList.join(" ");
 
-		// For end mode with line-limit, use CSS line-clamp
-		let style = "";
-		if (isEndMode && isMultiline) {
-			style = `display: -webkit-box; -webkit-line-clamp: ${this.lineLimit}; -webkit-box-orient: vertical; overflow: hidden;`;
-		}
-
 		return html`
-			<div class=${classes} style=${style}></div>
+			<div class=${classes}></div>
 			<slot @slotchange=${this.handleSlotChange} style="display: none;"></slot>
 		`;
 	}

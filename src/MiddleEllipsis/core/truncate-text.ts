@@ -36,7 +36,13 @@ const truncateText = ({
 
 	// First, check if the original text actually fits in the DOM
 	targetElement.textContent = originalText;
-	if (targetElement.scrollWidth <= targetElement.clientWidth) {
+
+	// For multiline, also check height overflow
+	const fitsInWidth = targetElement.scrollWidth <= targetElement.clientWidth;
+	const fitsInHeight =
+		lineLimit === 1 || targetElement.scrollHeight <= targetElement.clientHeight;
+
+	if (fitsInWidth && fitsInHeight) {
 		return originalText;
 	}
 
@@ -102,7 +108,8 @@ const truncateText = ({
 
 	// Fine-tune: if text overflows, remove characters until it fits
 	while (
-		targetElement.scrollWidth > targetElement.clientWidth &&
+		(targetElement.scrollWidth > targetElement.clientWidth ||
+			targetElement.scrollHeight > targetElement.clientHeight) &&
 		(firstHalf.length > 0 || secondHalf.length > 0)
 	) {
 		// Remove from the longer half to maintain balance
@@ -128,7 +135,10 @@ const truncateText = ({
 		if (testLastChar) {
 			const testResult = firstHalf + ellipsisSymbol + testLastChar + secondHalf;
 			targetElement.textContent = testResult;
-			if (targetElement.scrollWidth <= targetElement.clientWidth) {
+			if (
+				targetElement.scrollWidth <= targetElement.clientWidth &&
+				targetElement.scrollHeight <= targetElement.clientHeight
+			) {
 				secondHalf = testLastChar + secondHalf;
 				lastIndex--;
 				result = testResult;
@@ -141,7 +151,10 @@ const truncateText = ({
 			const testResult =
 				firstHalf + testFirstChar + ellipsisSymbol + secondHalf;
 			targetElement.textContent = testResult;
-			if (targetElement.scrollWidth <= targetElement.clientWidth) {
+			if (
+				targetElement.scrollWidth <= targetElement.clientWidth &&
+				targetElement.scrollHeight <= targetElement.clientHeight
+			) {
 				firstHalf = firstHalf + testFirstChar;
 				firstIndex++;
 				result = testResult;
@@ -165,6 +178,8 @@ export const truncateOnResize = ({
 	// If there's no original text, nothing to do.
 	if (!originalText) return () => {};
 
+	let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+
 	// Helper that performs a single truncation pass.
 	const runTruncate = () => {
 		const truncatedText = truncateText({
@@ -184,11 +199,22 @@ export const truncateOnResize = ({
 	// Run once immediately so the element is correct on initial render/layout.
 	runTruncate();
 
+	// Debounced resize handler to prevent excessive updates
+	const debouncedTruncate = () => {
+		if (resizeTimeout) {
+			clearTimeout(resizeTimeout);
+		}
+		resizeTimeout = setTimeout(() => {
+			runTruncate();
+			resizeTimeout = null;
+		}, 10);
+	};
+
 	// Observe resizes to recompute truncation. Prefer observing the offsetParent
 	// (so changes to the container width trigger recalculation). If offsetParent
 	// is not available, observe the element itself.
 	const observer = new ResizeObserver(() => {
-		runTruncate();
+		debouncedTruncate();
 	});
 
 	// For shadow DOM, observe the host element or boundingElement if provided
@@ -206,5 +232,10 @@ export const truncateOnResize = ({
 
 	observer.observe(observeTarget);
 
-	return () => observer.disconnect();
+	return () => {
+		observer.disconnect();
+		if (resizeTimeout) {
+			clearTimeout(resizeTimeout);
+		}
+	};
 };
