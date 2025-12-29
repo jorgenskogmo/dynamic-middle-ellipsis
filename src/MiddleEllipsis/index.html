@@ -40,22 +40,6 @@
             font-size: 0.9rem;
         }
 
-        .container {
-            background-color: #e8f4f8;
-            border: 2px dashed #0088cc;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-        }
-
-        .container-50 {
-            width: 50%;
-        }
-
-        .container-30 {
-            width: 30%;
-        }
-
         .resizable {
             resize: horizontal;
             overflow: auto;
@@ -64,9 +48,6 @@
 
         middle-ellipsis {
             background-color: #fff3cd;
-            /* padding: 0.5rem;
-            border-radius: 4px; */
-            display: block;
         }
 
         code {
@@ -90,7 +71,7 @@
 </head>
 
 <body>
-    <h1>Dynamic Middle Ellipsis - Lit Component Demo</h1>
+    <h1>Dynamic Middle Ellipsis</h1>
 
 
     <div class="demo-section">
@@ -103,12 +84,12 @@
         </div>
         <div class="code-block">
             &lt;middle-ellipsis&gt;
-            This is a very long text that will be truncated in the middle...
+            This is a very long text that will be truncated in the middle when the container is not wide enough to display it all
             &lt;/middle-ellipsis&gt;
         </div>
     </div>
 
-    <!--
+
     <div class="demo-section">
         <h2>2. Custom Ellipsis Symbol</h2>
         <p>Use the <code>ellipsis-symbol</code> attribute to customize the truncation indicator.</p>
@@ -119,12 +100,12 @@
         </div>
         <div class="code-block">
             &lt;middle-ellipsis ellipsis-symbol="[...]"&gt;
-            /home/user/documents/projects/...
+            /home/user/documents/projects/my-awesome-project/src/components/MiddleEllipsis/implementation/v2/final.tsx
             &lt;/middle-ellipsis&gt;
         </div>
     </div>
 
-    
+
     <div class="demo-section">
         <h2>3. Various Custom Symbols</h2>
         <p>Examples with different ellipsis symbols: triple dots, arrows, and emojis.</p>
@@ -148,7 +129,7 @@
         </div>
     </div>
 
-    
+
     <div class="demo-section">
         <h2>4. Multi-Line Truncation</h2>
         <p>Use the <code>line-limit</code> attribute to allow text to span multiple lines before truncating.</p>
@@ -167,16 +148,16 @@
 
         <div class="code-block">
             &lt;middle-ellipsis line-limit="2"&gt;
-            Long text that wraps to multiple lines...
+            This is a much longer piece of text that demonstrates the multi-line truncation feature. The text will wrap to multiple lines and still truncate in the middle when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or file paths in a user interface.
             &lt;/middle-ellipsis&gt;
 
             &lt;middle-ellipsis line-limit="3" ellipsis-symbol=" [...] "&gt;
-            Even longer text...
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
             &lt;/middle-ellipsis&gt;
         </div>
     </div>
 
-    
+
     <div class="demo-section">
         <h2>5. Dynamic Resizing</h2>
         <p>The component automatically adjusts when its container is resized. Try dragging the bottom-right corner!</p>
@@ -188,7 +169,7 @@
         <p style="margin-top: 1rem; font-style: italic; color: #888;">👉 Drag the bottom-right corner to resize</p>
     </div>
 
-    
+
     <div class="demo-section">
         <h2>6. Narrow Containers</h2>
         <p>The component handles very narrow containers gracefully.</p>
@@ -199,7 +180,7 @@
         </div>
     </div>
 
-    
+
     <div class="demo-section">
         <h2>7. Real-World Use Cases</h2>
 
@@ -231,7 +212,7 @@
             </middle-ellipsis>
         </div>
     </div>
--->
+
 
     <script type="module" src="example.ts"></script>
     <script>

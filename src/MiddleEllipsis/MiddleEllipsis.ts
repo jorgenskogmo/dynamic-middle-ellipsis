@@ -46,6 +46,7 @@ export class MiddleEllipsis extends LitElement {
 	static styles = css`
 		:host {
 			display: block;
+			outline: 1px solid #f00;
 		}
 		
 		.wrapper {
@@ -55,13 +56,13 @@ export class MiddleEllipsis extends LitElement {
 		
 		.content {
 			white-space: nowrap;
-			overflow: hidden;
+			/* overflow: hidden; */
 		}
 		
 		.content.multiline {
 			white-space: normal;
 			word-wrap: break-word;
-			overflow: hidden;
+			/* overflow: hidden; */
 		}
 	`;
 

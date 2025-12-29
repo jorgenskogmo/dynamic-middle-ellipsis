@@ -71,8 +71,8 @@ const measureCharacterWidth = (
 	canvasContext.font = `${fontSize}px ${fontFamily}`;
 	// Measure the character twice to account for font kerning and spacing
 	const metrics = canvasContext.measureText(character + character);
-	// Use Math.ceil to round up and avoid sub-pixel clipping issues
-	return Math.ceil(metrics.width / 2);
+	// Use the precise width without rounding to maximize space usage
+	return metrics.width / 2;
 };
 
 export const getCharacterWidth = (

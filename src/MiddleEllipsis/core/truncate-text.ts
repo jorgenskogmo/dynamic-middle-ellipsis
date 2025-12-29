@@ -32,9 +32,8 @@ const truncateText = ({
 
 	const originalAvailableWidth = availableWidth;
 
-	// Add a small safety buffer to account for sub-pixel rendering and rounding errors
-	// This prevents the last character from being clipped
-	const SAFETY_BUFFER = 2; // pixels - minimal buffer for sub-pixel rounding
+	// Use a minimal buffer for the initial calculation
+	const SAFETY_BUFFER = 2;
 	availableWidth = availableWidth - SAFETY_BUFFER;
 
 	const maxTextWidth = getStringWidth(originalText, fontSize, fontFamily);
@@ -69,31 +68,106 @@ const truncateText = ({
 	let remainingWidth = availableWidth - middleEllipsisWidth;
 	let firstHalf = "";
 	let secondHalf = "";
+	let firstIndex = 0;
+	let lastIndex = originalTextLength - 1;
 
-	for (let i = 0; i < Math.floor(originalTextLength / 2); i++) {
+	// Greedily add characters from both ends
+	while (firstIndex <= lastIndex) {
 		const firstCharWidth = getCharacterWidth(
-			originalText[i],
+			originalText[firstIndex],
 			fontFamily,
 			fontSize,
 		);
 		const lastCharWidth = getCharacterWidth(
-			originalText[originalTextLength - i - 1],
+			originalText[lastIndex],
 			fontFamily,
 			fontSize,
 		);
 
-		// Check if adding both characters would exceed the remaining width
-		// Use <= instead of < to be more conservative
-		if (remainingWidth - firstCharWidth - lastCharWidth <= 0) break;
+		// Try to add both characters if possible
+		if (remainingWidth >= firstCharWidth + lastCharWidth) {
+			remainingWidth -= firstCharWidth;
+			firstHalf += originalText[firstIndex];
+			firstIndex++;
 
-		remainingWidth -= firstCharWidth;
-		firstHalf += originalText[i];
-
-		remainingWidth -= lastCharWidth;
-		secondHalf = originalText[originalTextLength - i - 1] + secondHalf;
+			remainingWidth -= lastCharWidth;
+			secondHalf = originalText[lastIndex] + secondHalf;
+			lastIndex--;
+		}
+		// If we can't fit both, try just the first character
+		else if (remainingWidth >= firstCharWidth) {
+			remainingWidth -= firstCharWidth;
+			firstHalf += originalText[firstIndex];
+			firstIndex++;
+		}
+		// If we can't fit the first, try just the last character
+		else if (remainingWidth >= lastCharWidth) {
+			remainingWidth -= lastCharWidth;
+			secondHalf = originalText[lastIndex] + secondHalf;
+			lastIndex--;
+		}
+		// If we can't fit either, we're done
+		else {
+			break;
+		}
 	}
 
-	const result = firstHalf + ellipsisSymbol + secondHalf;
+	let result = firstHalf + ellipsisSymbol + secondHalf;
+
+	// Set the initial result and check if it actually overflows
+	targetElement.textContent = result;
+
+	// Fine-tune: if text overflows, remove characters until it fits
+	while (
+		targetElement.scrollWidth > targetElement.clientWidth &&
+		(firstHalf.length > 0 || secondHalf.length > 0)
+	) {
+		// Remove from the longer half to maintain balance
+		if (firstHalf.length >= secondHalf.length && firstHalf.length > 0) {
+			firstHalf = firstHalf.slice(0, -1);
+		} else if (secondHalf.length > 0) {
+			secondHalf = secondHalf.slice(1);
+		}
+		result = firstHalf + ellipsisSymbol + secondHalf;
+		targetElement.textContent = result;
+	}
+
+	// Optimize: try adding characters back if there's space
+	let canAddMore = true;
+	while (canAddMore && firstIndex <= lastIndex) {
+		const testFirstChar =
+			firstIndex < originalTextLength ? originalText[firstIndex] : null;
+		const testLastChar = lastIndex >= 0 ? originalText[lastIndex] : null;
+
+		let added = false;
+
+		// Try adding from the end first (to complete the sentence)
+		if (testLastChar) {
+			const testResult = firstHalf + ellipsisSymbol + testLastChar + secondHalf;
+			targetElement.textContent = testResult;
+			if (targetElement.scrollWidth <= targetElement.clientWidth) {
+				secondHalf = testLastChar + secondHalf;
+				lastIndex--;
+				result = testResult;
+				added = true;
+			}
+		}
+
+		// If we couldn't add from end, try from start
+		if (!added && testFirstChar) {
+			const testResult =
+				firstHalf + testFirstChar + ellipsisSymbol + secondHalf;
+			targetElement.textContent = testResult;
+			if (targetElement.scrollWidth <= targetElement.clientWidth) {
+				firstHalf = firstHalf + testFirstChar;
+				firstIndex++;
+				result = testResult;
+				added = true;
+			}
+		}
+
+		canAddMore = added;
+	}
 
 	// Debug logging for the result
 	if ((window as any).__DEBUG_TRUNCATE__) {
