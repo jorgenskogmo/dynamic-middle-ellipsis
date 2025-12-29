@@ -30,34 +30,17 @@ const truncateText = ({
 			availableWidth * lineLimit - getCharacterWidth("W", fontFamily, fontSize);
 	}
 
-	const originalAvailableWidth = availableWidth;
-
 	// Use a minimal buffer for the initial calculation
 	const SAFETY_BUFFER = 2;
 	availableWidth = availableWidth - SAFETY_BUFFER;
 
-	const maxTextWidth = getStringWidth(originalText, fontSize, fontFamily);
-
-	// Debug logging (can be enabled via console)
-	if ((window as any).__DEBUG_TRUNCATE__) {
-		console.log("🔍 Truncate Debug:", {
-			originalText,
-			availableWidth: originalAvailableWidth,
-			adjustedWidth: availableWidth,
-			maxTextWidth,
-			needsTruncation: maxTextWidth > availableWidth,
-			fontFamily,
-			fontSize,
-		});
+	// First, check if the original text actually fits in the DOM
+	targetElement.textContent = originalText;
+	if (targetElement.scrollWidth <= targetElement.clientWidth) {
+		return originalText;
 	}
 
-	/*
-		If maximum possible originalText width is less than or equal to available width,
-		then there is no need to truncate originalText.
-		Return original originalText.
-	*/
-	if (maxTextWidth <= availableWidth) return originalText;
-
+	const maxTextWidth = getStringWidth(originalText, fontSize, fontFamily);
 	const middleEllipsisWidth = getStringWidth(
 		ellipsisSymbol,
 		fontSize,
@@ -167,20 +150,6 @@ const truncateText = ({
 		}
 
 		canAddMore = added;
-	}
-
-	// Debug logging for the result
-	if ((window as any).__DEBUG_TRUNCATE__) {
-		const resultWidth = getStringWidth(result, fontSize, fontFamily);
-		console.log("📏 Truncate Result:", {
-			result,
-			resultLength: result.length,
-			resultWidth,
-			availableWidth,
-			difference: availableWidth - resultWidth,
-			firstHalfLength: firstHalf.length,
-			secondHalfLength: secondHalf.length,
-		});
 	}
 
 	return result;

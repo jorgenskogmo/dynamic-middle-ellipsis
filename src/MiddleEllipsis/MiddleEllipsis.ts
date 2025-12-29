@@ -46,23 +46,26 @@ export class MiddleEllipsis extends LitElement {
 	static styles = css`
 		:host {
 			display: block;
-			outline: 1px solid #f00;
+			max-width: 100%;
+			box-sizing: border-box;
+			outline: 2px solid #f00;
 		}
 		
 		.wrapper {
 			width: 100%;
 			box-sizing: border-box;
+			outline: 1px solid #0f0;
 		}
 		
 		.content {
 			white-space: nowrap;
-			/* overflow: hidden; */
+			overflow: hidden;
 		}
 		
 		.content.multiline {
 			white-space: normal;
 			word-wrap: break-word;
-			/* overflow: hidden; */
+			overflow: hidden;
 		}
 	`;
 
@@ -139,6 +142,7 @@ export class MiddleEllipsis extends LitElement {
 		const truncateOnResize = createMiddleEllipsisUtils();
 
 		this.cleanupTruncate = truncateOnResize({
+			boundingElement: this as unknown as HTMLElement,
 			targetElement: this.contentElement,
 			originalText: this.slotContent,
 			ellipsisSymbol: this.ellipsisSymbol,
@@ -151,7 +155,10 @@ export class MiddleEllipsis extends LitElement {
 	}
 
 	protected firstUpdated() {
-		this.setupTruncation();
+		// Use requestAnimationFrame to ensure DOM is fully rendered with correct widths
+		requestAnimationFrame(() => {
+			this.setupTruncation();
+		});
 	}
 
 	protected updated(changedProperties: Map<string, unknown>) {

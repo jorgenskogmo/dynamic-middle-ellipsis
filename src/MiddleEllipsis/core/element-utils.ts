@@ -110,23 +110,6 @@ export const getAvailableWidthWhenSharing = (
 			targetProps.marginXWidth;
 
 		const availableWidth = boundingProps.innerWidth - takenWidth;
-
-		// Debug logging
-		if ((window as any).__DEBUG_TRUNCATE__) {
-			console.log("🔍 Width Calculation (Shadow DOM):", {
-				boundingElement: boundingElement.className,
-				boundingWidth: boundingProps.innerWidth,
-				boundingPadding: boundingProps.paddingXWidth,
-				boundingBorder: boundingProps.borderXWidth,
-				targetElement: targetElement.className,
-				targetPadding: targetProps.paddingXWidth,
-				targetBorder: targetProps.borderXWidth,
-				targetMargin: targetProps.marginXWidth,
-				takenWidth,
-				availableWidth,
-			});
-		}
-
 		return availableWidth;
 	}
 
@@ -146,23 +129,6 @@ export const getAvailableWidthWhenSharing = (
 			targetProps.marginXWidth;
 
 		const availableWidth = hostProps.innerWidth - takenWidth;
-
-		// Debug logging
-		if ((window as any).__DEBUG_TRUNCATE__) {
-			console.log("🔍 Width Calculation (Host Element):", {
-				hostTag: (boundingElement as any).tagName,
-				hostWidth: hostProps.innerWidth,
-				hostPadding: hostProps.paddingXWidth,
-				hostBorder: hostProps.borderXWidth,
-				targetElement: targetElement.className,
-				targetPadding: targetProps.paddingXWidth,
-				targetBorder: targetProps.borderXWidth,
-				targetMargin: targetProps.marginXWidth,
-				takenWidth,
-				availableWidth,
-			});
-		}
-
 		return availableWidth;
 	}
 

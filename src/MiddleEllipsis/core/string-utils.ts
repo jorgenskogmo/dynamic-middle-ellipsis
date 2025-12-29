@@ -24,13 +24,6 @@ export const setFontWidthMap = (customMap: FontWidthMap) => {
 
 export const setForceCanvasMode = (enabled: boolean) => {
 	forceCanvasMode = enabled;
-	if (enabled) {
-		console.log(
-			"🎨 Canvas measurement mode ENABLED - bypassing font width maps",
-		);
-	} else {
-		console.log("📊 Font width map mode ENABLED");
-	}
 };
 
 export const enableDebugMode = (fontFamily: string) => {
@@ -46,14 +39,6 @@ export const enableDebugMode = (fontFamily: string) => {
 export const getDebugStats = () => ({ ...debugStats });
 
 export const disableDebugMode = () => {
-	if (debugMode) {
-		console.log(`🔍 Font Width Debug Stats for "${debugStats.fontFamily}":`, {
-			totalCharacters: debugStats.totalCharacters,
-			usedPrecomputedMap: debugStats.usedMap,
-			usedCanvasMeasurement: debugStats.usedCanvas,
-			hasMapEntry: !!fontWidthMap[debugStats.fontFamily],
-		});
-	}
 	debugMode = false;
 };
 
