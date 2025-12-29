@@ -1,12 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import { generateCharacterWidthMapping } from "./core/font-width-generator";
 import createMiddleEllipsisUtils from "./core/index";
-import {
-	disableDebugMode,
-	enableDebugMode,
-	setForceCanvasMode,
-} from "./core/string-utils";
 
 /**
  * Lit web component for dynamic middle ellipsis text truncation.
@@ -24,20 +18,6 @@ import {
  * ```html
  * <middle-ellipsis ellipsis-symbol="[...]" line-limit="2">
  *   Multi-line text with custom ellipsis
- * </middle-ellipsis>
- * ```
- *
- * @example Debug mode to generate font width mappings
- * ```html
- * <middle-ellipsis debug-font-mapping>
- *   Text to analyze font mapping
- * </middle-ellipsis>
- * ```
- *
- * @example Force Canvas mode for pixel-perfect measurements
- * ```html
- * <middle-ellipsis force-canvas>
- *   Use Canvas measureText for pixel-perfect accuracy
  * </middle-ellipsis>
  * ```
  */
@@ -68,21 +48,11 @@ export class MiddleEllipsis extends LitElement {
 	@property({ type: Number, attribute: "line-limit" })
 	lineLimit = 1;
 
-	@property({ type: Boolean, attribute: "debug-font-mapping" })
-	debugFontMapping = false;
-
-	@property({ type: Boolean, attribute: "force-canvas" })
-	forceCanvas = false;
-
 	@query(".content")
 	private contentElement!: HTMLDivElement;
 
 	private cleanupTruncate?: () => void;
 	private slotContent = "";
-
-	connectedCallback() {
-		super.connectedCallback();
-	}
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
@@ -103,32 +73,6 @@ export class MiddleEllipsis extends LitElement {
 	private setupTruncation() {
 		if (!this.contentElement || !this.slotContent) return;
 
-		const style = window.getComputedStyle(this.contentElement);
-		const fontFamily = style.fontFamily.split(",")[0];
-		const fontSize = style.fontSize;
-
-		setForceCanvasMode(this.forceCanvas);
-
-		if (this.debugFontMapping) {
-			console.group(`🔍 Font Mapping Debug - <middle-ellipsis>`);
-			console.log(`Font Family: ${fontFamily}`);
-			console.log(`Font Size: ${fontSize}`);
-			console.log(`Text: "${this.slotContent}"`);
-			console.log(`Force Canvas Mode: ${this.forceCanvas}`);
-
-			try {
-				const mapping = generateCharacterWidthMapping(fontFamily);
-				console.log(`\nCharacter Width Mapping for ${fontFamily}:`);
-				console.log(JSON.stringify(mapping, null, 2));
-				console.log(`\nAdd this to default-font-width-map.ts:`);
-				console.log(`"${fontFamily}": ${JSON.stringify(mapping, null, 2)},`);
-			} catch (error) {
-				console.error("Failed to generate font mapping:", error);
-			}
-
-			enableDebugMode(fontFamily);
-		}
-
 		const truncateOnResize = createMiddleEllipsisUtils();
 
 		this.cleanupTruncate = truncateOnResize({
@@ -138,10 +82,6 @@ export class MiddleEllipsis extends LitElement {
 			ellipsisSymbol: this.ellipsisSymbol,
 			lineLimit: this.lineLimit,
 		});
-		if (this.debugFontMapping) {
-			disableDebugMode();
-			console.groupEnd();
-		}
 	}
 
 	protected firstUpdated() {
@@ -154,9 +94,7 @@ export class MiddleEllipsis extends LitElement {
 	protected updated(changedProperties: Map<string, unknown>) {
 		if (
 			changedProperties.has("ellipsisSymbol") ||
-			changedProperties.has("lineLimit") ||
-			changedProperties.has("debugFontMapping") ||
-			changedProperties.has("forceCanvas")
+			changedProperties.has("lineLimit")
 		) {
 			this.cleanupTruncate?.();
 			this.setupTruncation();

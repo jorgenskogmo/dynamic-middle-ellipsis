@@ -9,37 +9,8 @@ const canvasContext =
 		? document.createElement("canvas").getContext("2d")
 		: null;
 
-let debugMode = false;
-let forceCanvasMode = false;
-let debugStats = {
-	fontFamily: "",
-	usedMap: false,
-	usedCanvas: false,
-	totalCharacters: 0,
-};
-
 export const setFontWidthMap = (customMap: FontWidthMap) => {
 	fontWidthMap = customMap;
-};
-
-export const setForceCanvasMode = (enabled: boolean) => {
-	forceCanvasMode = enabled;
-};
-
-export const enableDebugMode = (fontFamily: string) => {
-	debugMode = true;
-	debugStats = {
-		fontFamily,
-		usedMap: false,
-		usedCanvas: false,
-		totalCharacters: 0,
-	};
-};
-
-export const getDebugStats = () => ({ ...debugStats });
-
-export const disableDebugMode = () => {
-	debugMode = false;
 };
 
 // Measure character width using Canvas API for accuracy
@@ -65,32 +36,14 @@ export const getCharacterWidth = (
 	fontFamily: string,
 	fontSize = 16,
 ) => {
-	if (debugMode) {
-		debugStats.totalCharacters++;
-	}
-
-	// Force canvas mode bypasses the font map entirely
-	if (forceCanvasMode) {
-		if (debugMode) {
-			debugStats.usedCanvas = true;
-		}
-		return measureCharacterWidth(character, fontFamily, fontSize);
-	}
-
 	const characterWidthMap = fontWidthMap[fontFamily];
 
 	// If we have the font in our map and the character, use it (scaled)
 	if (characterWidthMap && characterWidthMap[character] !== undefined) {
-		if (debugMode) {
-			debugStats.usedMap = true;
-		}
 		return characterWidthMap[character] * (fontSize / 16);
 	}
 
 	// Otherwise, measure it dynamically with Canvas
-	if (debugMode) {
-		debugStats.usedCanvas = true;
-	}
 	return measureCharacterWidth(character, fontFamily, fontSize);
 };
 
