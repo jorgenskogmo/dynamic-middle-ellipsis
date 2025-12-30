@@ -1,18 +1,30 @@
 {
-	"name": "dynamic-middle-ellipsis-monorepo",
-	"version": "0.9.1",
-	"private": true,
-	"description": "Dynamic text truncation with middle ellipsis for multiple frameworks",
-	"author": "Lalit Rana",
-	"license": "MIT",
-	"scripts": {
-		"dev": "vite dev"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.0.6",
-		"vite": "^7.3.0"
-	},
-	"dependencies": {
-		"lit": "^3.3.1"
-	}
+  "name": "dynamic-middle-ellipsis-monorepo",
+  "version": "0.9.1",
+  "private": true,
+  "description": "Dynamic text truncation with middle ellipsis for multiple frameworks",
+  "author": "Lalit Rana",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite dev",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "vite": "^7.3.0",
+    "storybook": "^10.1.11",
+    "@storybook/web-components-vite": "^10.1.11",
+    "@chromatic-com/storybook": "^4.1.3",
+    "@storybook/addon-vitest": "^10.1.11",
+    "@storybook/addon-a11y": "^10.1.11",
+    "@storybook/addon-docs": "^10.1.11",
+    "vitest": "^4.0.16",
+    "playwright": "^1.57.0",
+    "@vitest/browser-playwright": "^4.0.16",
+    "@vitest/coverage-v8": "^4.0.16"
+  },
+  "dependencies": {
+    "lit": "^3.3.1"
+  }
 }

@@ -46,7 +46,7 @@
             min-width: 150px;
         }
 
-        middle-ellipsis {
+        text-truncate {
             background-color: #fff3cd;
         }
 
@@ -78,14 +78,14 @@
         <h2>1. Basic Single-Line Truncation (Default)</h2>
         <p>The simplest use case with default settings. Text truncates in the middle with the HTML ellipsis character (…).</p>
         <div class="container container-50">
-            <middle-ellipsis force-canvas>
+            <text-truncate>
                 This is a very long text that will be truncated in the middle when the container is not wide enough to display it all
-            </middle-ellipsis>
+            </text-truncate>
         </div>
         <div class="code-block">
-            &lt;middle-ellipsis&gt;
+            &lt;text-truncate&gt;
             This is a very long text that will be truncated in the middle when the container is not wide enough to display it all
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
     </div>
 
@@ -94,14 +94,14 @@
         <h2>2. Custom Ellipsis Symbol</h2>
         <p>Use the <code>ellipsis-symbol</code> attribute to customize the truncation indicator.</p>
         <div class="container container-50">
-            <middle-ellipsis ellipsis-symbol="[...]">
+            <text-truncate ellipsis-symbol="[...]">
                 /home/user/documents/projects/my-awesome-project/src/components/MiddleEllipsis/implementation/v2/final.tsx
-            </middle-ellipsis>
+            </text-truncate>
         </div>
         <div class="code-block">
-            &lt;middle-ellipsis ellipsis-symbol="[...]"&gt;
+            &lt;text-truncate ellipsis-symbol="[...]"&gt;
             /home/user/documents/projects/my-awesome-project/src/components/MiddleEllipsis/implementation/v2/final.tsx
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
     </div>
 
@@ -111,26 +111,26 @@
         <p>Examples with different ellipsis symbols: triple dots, arrows, and emojis.</p>
 
         <div class="container container-50">
-            <middle-ellipsis ellipsis-symbol="...">
+            <text-truncate ellipsis-symbol="...">
                 Product Name: Ultra Premium Wireless Noise Cancelling Headphones with Advanced Sound Technology
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <br />
 
         <div class="container container-50">
-            <middle-ellipsis ellipsis-symbol=" ⟷ ">
+            <text-truncate ellipsis-symbol=" ⟷ ">
                 user@example.com/documents/work/presentations/q4-2024/sales-report-final-reviewed-approved.pdf
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <br />
 
 
         <div class="container container-50">
-            <middle-ellipsis ellipsis-symbol=" 🔗 ">
+            <text-truncate ellipsis-symbol=" 🔗 ">
                 https://www.example.com/api/v1/users/12345/profile/settings/notifications/preferences/email
-            </middle-ellipsis>
+            </text-truncate>
         </div>
     </div>
 
@@ -140,29 +140,29 @@
         <p>Use the <code>line-limit</code> attribute to allow text to span multiple lines before truncating.</p>
 
         <div class="container container-50">
-            <middle-ellipsis line-limit="2">
+            <text-truncate line-limit="2">
                 This is a much longer piece of text that demonstrates the multi-line truncation feature. The text will wrap to multiple lines and still truncate in the middle when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or file paths in a user interface.
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis line-limit="2"&gt;
+            &lt;text-truncate line-limit="2"&gt;
             This is a much longer piece of text that demonstrates the multi-line truncation feature. The text will wrap to multiple lines and still truncate in the middle when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or file paths in a user interface.
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
 
         <br />
 
         <div class="container container-50">
-            <middle-ellipsis line-limit="3" ellipsis-symbol=" [...] ">
+            <text-truncate line-limit="3" ellipsis-symbol=" [...] ">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis line-limit="3" ellipsis-symbol=" [...] "&gt;
+            &lt;text-truncate line-limit="3" ellipsis-symbol=" [...] "&gt;
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
     </div>
 
@@ -171,9 +171,9 @@
         <h2>5. Dynamic Resizing</h2>
         <p>The component automatically adjusts when its container is resized. Try dragging the bottom-right corner!</p>
         <div class="container resizable" style="width: 400px;">
-            <middle-ellipsis>
+            <text-truncate>
                 Resize this container by dragging the corner! The text will dynamically truncate as you resize: /Users/developer/projects/awesome-app/src/components/ui/display/TextTruncation.component.tsx
-            </middle-ellipsis>
+            </text-truncate>
         </div>
         <p style="margin-top: 1rem; font-style: italic; color: #888;">👉 Drag the bottom-right corner to resize</p>
     </div>
@@ -183,9 +183,9 @@
         <h2>6. Narrow Containers</h2>
         <p>The component handles very narrow containers gracefully.</p>
         <div class="container" style="width: 30%">
-            <middle-ellipsis>
+            <text-truncate>
                 SuperLongFileNameWithoutSpaces_v2_final_FINAL_approved.docx
-            </middle-ellipsis>
+            </text-truncate>
         </div>
     </div>
 
@@ -195,29 +195,29 @@
         <p>Use <code>variant="end"</code> to truncate text at the end instead of the middle. Perfect for traditional text clipping.</p>
 
         <div class="container container-50">
-            <middle-ellipsis variant="end">
+            <text-truncate variant="end">
                 This is a very long text that will be truncated at the end when the container is not wide enough to display it all
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis variant="end"&gt;
+            &lt;text-truncate variant="end"&gt;
             This is a very long text that will be truncated at the end when the container is not wide enough to display it all
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
 
         <br />
 
         <div class="container container-50">
-            <middle-ellipsis variant="end" ellipsis-symbol="...">
+            <text-truncate variant="end" ellipsis-symbol="...">
                 /home/user/documents/projects/my-awesome-project/src/components/MiddleEllipsis/implementation/v2/final.tsx
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis variant="end" ellipsis-symbol="..."&gt;
+            &lt;text-truncate variant="end" ellipsis-symbol="..."&gt;
             /home/user/documents/projects/my-awesome-project/src/components/MiddleEllipsis/implementation/v2/final.tsx
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
     </div>
 
@@ -227,29 +227,29 @@
         <p>Combine <code>variant="end"</code> with <code>line-limit</code> for multi-line end truncation using CSS line-clamp.</p>
 
         <div class="container container-50">
-            <middle-ellipsis variant="end" line-limit="2">
+            <text-truncate variant="end" line-limit="2">
                 This is a much longer piece of text that demonstrates the multi-line end truncation feature. The text will wrap to multiple lines and truncate at the end when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or article previews in a user interface.
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis variant="end" line-limit="2"&gt;
+            &lt;text-truncate variant="end" line-limit="2"&gt;
             This is a much longer piece of text that demonstrates the multi-line end truncation feature. The text will wrap to multiple lines and truncate at the end when it exceeds the specified line limit. This is particularly useful for displaying long descriptions or article previews in a user interface.
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
 
         <br />
 
         <div class="container container-50">
-            <middle-ellipsis variant="end" line-limit="3" ellipsis-symbol=" [read more]">
+            <text-truncate variant="end" line-limit="3" ellipsis-symbol=" [read more]">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <div class="code-block">
-            &lt;middle-ellipsis variant="end" line-limit="3" ellipsis-symbol=" [read more]"&gt;
+            &lt;text-truncate variant="end" line-limit="3" ellipsis-symbol=" [read more]"&gt;
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            &lt;/middle-ellipsis&gt;
+            &lt;/text-truncate&gt;
         </div>
     </div>
 
@@ -259,44 +259,44 @@
 
         <h3 style="margin-top: 1.5rem; color: #555;">File Paths (Middle)</h3>
         <div class="container container-50">
-            <middle-ellipsis ellipsis-symbol="...">
+            <text-truncate ellipsis-symbol="...">
                 C:\Users\JohnDoe\AppData\Local\Programs\MyApplication\resources\assets\images\icons\png\high-res\logo-2024.png
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <h3 style="margin-top: 1.5rem; color: #555;">File Paths (End)</h3>
         <div class="container container-50">
-            <middle-ellipsis variant="end" ellipsis-symbol="...">
+            <text-truncate variant="end" ellipsis-symbol="...">
                 C:\Users\JohnDoe\AppData\Local\Programs\MyApplication\resources\assets\images\icons\png\high-res\logo-2024.png
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <h3 style="margin-top: 1.5rem; color: #555;">Email Addresses</h3>
         <div class="container container-50">
-            <middle-ellipsis>
+            <text-truncate>
                 john.doe.developer.extraordinaire@my-super-long-company-name-inc.com
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <h3 style="margin-top: 1.5rem; color: #555;">URLs (End)</h3>
         <div class="container container-50">
-            <middle-ellipsis variant="end" ellipsis-symbol="…">
+            <text-truncate variant="end" ellipsis-symbol="…">
                 https://www.example-ecommerce-store.com/products/electronics/computers/laptops/gaming/high-performance/rtx-4090?color=black&amp;size=15inch&amp;storage=2tb
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <h3 style="margin-top: 1.5rem; color: #555;">Product Descriptions (Middle - 2 lines)</h3>
         <div class="container container-50">
-            <middle-ellipsis line-limit="2" ellipsis-symbol=" … ">
+            <text-truncate line-limit="2" ellipsis-symbol=" … ">
                 Premium Organic Extra Virgin Olive Oil from Certified Sustainable Farms in the Mediterranean Region - Cold Pressed, Non-GMO, Rich in Antioxidants - Perfect for Cooking and Salads - 500ml Glass Bottle
-            </middle-ellipsis>
+            </text-truncate>
         </div>
 
         <h3 style="margin-top: 1.5rem; color: #555;">Product Descriptions (End - 2 lines)</h3>
         <div class="container container-50">
-            <middle-ellipsis variant="end" line-limit="2">
+            <text-truncate variant="end" line-limit="2">
                 Premium Organic Extra Virgin Olive Oil from Certified Sustainable Farms in the Mediterranean Region - Cold Pressed, Non-GMO, Rich in Antioxidants - Perfect for Cooking and Salads - 500ml Glass Bottle
-            </middle-ellipsis>
+            </text-truncate>
         </div>
     </div>
 

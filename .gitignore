@@ -5,3 +5,6 @@
 **/local/
 
 .env
+
+*storybook.log
+storybook-static

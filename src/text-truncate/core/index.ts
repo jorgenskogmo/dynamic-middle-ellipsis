@@ -17,8 +17,8 @@ const createMiddleEllipsisUtils = (config?: MiddleEllipsisConfig) => {
 
 export type { FontWidthMap };
 export {
-	generateFontWidthMapping,
 	generateCharacterWidthMapping,
+	generateFontWidthMapping,
 	getCharacterWidth,
 } from "./font-width-generator";
 export default createMiddleEllipsisUtils;

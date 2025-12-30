@@ -1,28 +1,29 @@
-import { LitElement, css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
+
 import createMiddleEllipsisUtils from "./core/index";
 
 /**
- * Lit web component for dynamic middle ellipsis text truncation.
+ * Lit web component for dynamic text truncation.
  *
  * @slot - Default slot for text content to be truncated
  *
  * @example Basic usage
  * ```html
- * <middle-ellipsis>
+ * <text-truncate>
  *   This is a very long text that will be truncated in the middle
- * </middle-ellipsis>
+ * </text-truncate>
  * ```
  *
  * @example Custom ellipsis symbol with multi-line support
  * ```html
- * <middle-ellipsis ellipsis-symbol="[...]" line-limit="2">
+ * <text-truncate ellipsis-symbol="[...]" line-limit="2">
  *   Multi-line text with custom ellipsis
- * </middle-ellipsis>
+ * </text-truncate>
  * ```
  */
-@customElement("middle-ellipsis")
-export class MiddleEllipsis extends LitElement {
+@customElement("text-truncate")
+export class TextTruncate extends LitElement {
 	static styles = css`
 		:host {
 			display: block;
@@ -68,21 +69,53 @@ export class MiddleEllipsis extends LitElement {
 
 	private cleanupTruncate?: () => void;
 	private slotContent = "";
+	private slotObserver?: MutationObserver;
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
 		this.cleanupTruncate?.();
+		this.slotObserver?.disconnect();
 	}
 
 	private handleSlotChange(e: Event) {
 		const slot = e.target as HTMLSlotElement;
 		const nodes = slot.assignedNodes({ flatten: true });
-		this.slotContent = nodes
+		const newContent = nodes
 			.map((node) => node.textContent || "")
 			.join("")
 			.trim();
-		this.cleanupTruncate?.();
-		this.setupTruncation();
+
+		// Only update if content actually changed
+		if (newContent !== this.slotContent) {
+			this.slotContent = newContent;
+			this.cleanupTruncate?.();
+			this.setupTruncation();
+		}
+
+		// Set up observer for text node changes
+		this.slotObserver?.disconnect();
+		this.slotObserver = new MutationObserver(() => {
+			const updatedContent = nodes
+				.map((node) => node.textContent || "")
+				.join("")
+				.trim();
+			if (updatedContent !== this.slotContent) {
+				this.slotContent = updatedContent;
+				this.cleanupTruncate?.();
+				this.setupTruncation();
+			}
+		});
+
+		// Observe all text nodes
+		for (const node of nodes) {
+			if (node.nodeType === Node.TEXT_NODE && node.parentNode) {
+				this.slotObserver.observe(node.parentNode, {
+					characterData: true,
+					childList: true,
+					subtree: true,
+				});
+			}
+		}
 	}
 
 	private setupTruncation() {
@@ -94,7 +127,7 @@ export class MiddleEllipsis extends LitElement {
 			let lineHeight = parseFloat(computedStyle.lineHeight);
 
 			// If lineHeight is "normal" or NaN, calculate it from fontSize
-			if (isNaN(lineHeight)) {
+			if (Number.isNaN(lineHeight)) {
 				const fontSize = parseFloat(computedStyle.fontSize);
 				lineHeight = fontSize * 1.2; // Typical "normal" line-height
 			}
@@ -147,13 +180,34 @@ export class MiddleEllipsis extends LitElement {
 	}
 
 	protected updated(changedProperties: Map<string, unknown>) {
-		if (
+		// Check if any properties that affect truncation have changed
+		const shouldRetruncate =
 			changedProperties.has("ellipsisSymbol") ||
 			changedProperties.has("lineLimit") ||
-			changedProperties.has("variant")
-		) {
+			changedProperties.has("variant");
+
+		if (shouldRetruncate) {
 			this.cleanupTruncate?.();
 			this.setupTruncation();
+		}
+
+		// Also re-check slot content in case it changed without firing slotchange
+		if (changedProperties.size > 0) {
+			requestAnimationFrame(() => {
+				const slot = this.shadowRoot?.querySelector("slot") as HTMLSlotElement;
+				if (slot) {
+					const nodes = slot.assignedNodes({ flatten: true });
+					const newContent = nodes
+						.map((node) => node.textContent || "")
+						.join("")
+						.trim();
+					if (newContent && newContent !== this.slotContent) {
+						this.slotContent = newContent;
+						this.cleanupTruncate?.();
+						this.setupTruncation();
+					}
+				}
+			});
 		}
 	}
 
@@ -180,6 +234,6 @@ export class MiddleEllipsis extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		"middle-ellipsis": MiddleEllipsis;
+		"text-truncate": TextTruncate;
 	}
 }
