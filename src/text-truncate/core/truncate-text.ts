@@ -1,9 +1,7 @@
 import {
 	getAvailableWidth,
 	getAvailableWidthWhenSharing,
-	getElementProperties,
 } from "./element-utils";
-import { getCharacterWidth, getStringWidth } from "./string-utils";
 
 type TruncateOptions = {
 	boundingElement?: HTMLElement;
@@ -13,151 +11,153 @@ type TruncateOptions = {
 	lineLimit: number;
 };
 
+type TruncateResult = {
+	firstHalf: string;
+	secondHalf: string;
+	ellipsisSymbol: string;
+	truncated: boolean;
+};
+
+// Helper to set content with ellipsis as plain text (for measuring)
+const setTextContent = (
+	element: HTMLElement,
+	first: string,
+	ellipsis: string,
+	second: string,
+) => {
+	element.textContent = first + ellipsis + second;
+};
+
+// Helper to set content with ellipsis wrapped in a span (for final render)
+const setHtmlContent = (
+	element: HTMLElement,
+	first: string,
+	ellipsis: string,
+	second: string,
+) => {
+	// Escape HTML entities in text parts
+	const escapeHtml = (text: string) =>
+		text
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;");
+
+	element.innerHTML = `${escapeHtml(first)}<span part="ellipsis">${escapeHtml(ellipsis)}</span>${escapeHtml(second)}`;
+};
+
 const truncateText = ({
 	boundingElement,
 	targetElement,
 	originalText,
 	ellipsisSymbol,
 	lineLimit,
-}: TruncateOptions) => {
-	const { fontSize, fontFamily } = getElementProperties(targetElement);
+}: TruncateOptions): TruncateResult => {
 	let availableWidth = boundingElement
 		? getAvailableWidthWhenSharing(targetElement, boundingElement)
 		: getAvailableWidth(targetElement);
 
 	if (lineLimit > 1) {
-		availableWidth =
-			availableWidth * lineLimit - getCharacterWidth("W", fontFamily, fontSize);
+		// For multiline, multiply available width by line count
+		// Subtract some buffer for the last line
+		availableWidth = availableWidth * lineLimit - 20;
 	}
 
-	// Use a minimal buffer for the initial calculation
-	const SAFETY_BUFFER = 2;
-	availableWidth = availableWidth - SAFETY_BUFFER;
+	// If available width is 0 or negative, we can't truncate properly
+	// Return original text and let CSS handle overflow
+	if (availableWidth <= 0) {
+		targetElement.textContent = originalText;
+		return {
+			firstHalf: originalText,
+			secondHalf: "",
+			ellipsisSymbol: "",
+			truncated: false,
+		};
+	}
 
 	// First, check if the original text actually fits in the DOM
 	targetElement.textContent = originalText;
 
-	// For multiline, also check height overflow
-	const fitsInWidth = targetElement.scrollWidth <= targetElement.clientWidth;
-	const fitsInHeight =
-		lineLimit === 1 || targetElement.scrollHeight <= targetElement.clientHeight;
-
-	if (fitsInWidth && fitsInHeight) {
-		return originalText;
+	// Check if element has actual dimensions - if clientWidth is 0,
+	// the element isn't properly laid out yet
+	if (targetElement.clientWidth === 0) {
+		return {
+			firstHalf: originalText,
+			secondHalf: "",
+			ellipsisSymbol: "",
+			truncated: false,
+		};
 	}
 
-	const maxTextWidth = getStringWidth(originalText, fontSize, fontFamily);
-	const middleEllipsisWidth = getStringWidth(
-		ellipsisSymbol,
-		fontSize,
-		fontFamily,
-	);
+	// Helper to check overflow based on lineLimit
+	const checkOverflow = () =>
+		targetElement.scrollWidth > targetElement.clientWidth ||
+		(lineLimit > 1 && targetElement.scrollHeight > targetElement.clientHeight);
+
+	// Check if original text fits
+	if (!checkOverflow()) {
+		return {
+			firstHalf: originalText,
+			secondHalf: "",
+			ellipsisSymbol: "",
+			truncated: false,
+		};
+	}
+
 	const originalTextLength = originalText.length;
 
-	let remainingWidth = availableWidth - middleEllipsisWidth;
-	let firstHalf = "";
-	let secondHalf = "";
-	let firstIndex = 0;
-	let lastIndex = originalTextLength - 1;
+	// Use binary search to find optimal truncation point
+	// This is more reliable across browsers than character width estimation
+	let left = 0;
+	let right = Math.floor(originalTextLength / 2);
+	let bestFirstHalf = "";
+	let bestSecondHalf = "";
 
-	// Greedily add characters from both ends
-	while (firstIndex <= lastIndex) {
-		const firstCharWidth = getCharacterWidth(
-			originalText[firstIndex],
-			fontFamily,
-			fontSize,
-		);
-		const lastCharWidth = getCharacterWidth(
-			originalText[lastIndex],
-			fontFamily,
-			fontSize,
-		);
+	while (left <= right) {
+		const mid = Math.floor((left + right) / 2);
+		const firstHalf = originalText.slice(0, mid);
+		const secondHalf = originalText.slice(originalTextLength - mid);
+		const testResult = firstHalf + ellipsisSymbol + secondHalf;
 
-		// Try to add both characters if possible
-		if (remainingWidth >= firstCharWidth + lastCharWidth) {
-			remainingWidth -= firstCharWidth;
-			firstHalf += originalText[firstIndex];
-			firstIndex++;
+		targetElement.textContent = testResult;
 
-			remainingWidth -= lastCharWidth;
-			secondHalf = originalText[lastIndex] + secondHalf;
-			lastIndex--;
-		}
-		// If we can't fit both, try just the first character
-		else if (remainingWidth >= firstCharWidth) {
-			remainingWidth -= firstCharWidth;
-			firstHalf += originalText[firstIndex];
-			firstIndex++;
-		}
-		// If we can't fit the first, try just the last character
-		else if (remainingWidth >= lastCharWidth) {
-			remainingWidth -= lastCharWidth;
-			secondHalf = originalText[lastIndex] + secondHalf;
-			lastIndex--;
-		}
-		// If we can't fit either, we're done
-		else {
-			break;
+		if (checkOverflow()) {
+			right = mid - 1;
+		} else {
+			bestFirstHalf = firstHalf;
+			bestSecondHalf = secondHalf;
+			left = mid + 1;
 		}
 	}
 
-	let result = firstHalf + ellipsisSymbol + secondHalf;
+	setTextContent(targetElement, bestFirstHalf, ellipsisSymbol, bestSecondHalf);
 
-	// Set the initial result and check if it actually overflows
-	targetElement.textContent = result;
-
-	// Fine-tune: if text overflows, remove characters until it fits
-	while (
-		(targetElement.scrollWidth > targetElement.clientWidth ||
-			targetElement.scrollHeight > targetElement.clientHeight) &&
-		(firstHalf.length > 0 || secondHalf.length > 0)
-	) {
-		// Remove from the longer half to maintain balance
-		if (firstHalf.length >= secondHalf.length && firstHalf.length > 0) {
-			firstHalf = firstHalf.slice(0, -1);
-		} else if (secondHalf.length > 0) {
-			secondHalf = secondHalf.slice(1);
-		}
-		result = firstHalf + ellipsisSymbol + secondHalf;
-		targetElement.textContent = result;
-	}
-
-	// Optimize: try adding characters back if there's space
+	// Fine-tune: try adding more characters from each end
 	let canAddMore = true;
-	while (canAddMore && firstIndex <= lastIndex) {
-		const testFirstChar =
-			firstIndex < originalTextLength ? originalText[firstIndex] : null;
-		const testLastChar = lastIndex >= 0 ? originalText[lastIndex] : null;
+	let firstIndex = bestFirstHalf.length;
+	let lastIndex = originalTextLength - bestSecondHalf.length - 1;
 
+	while (canAddMore && firstIndex <= lastIndex) {
 		let added = false;
 
-		// Try adding from the end first (to complete the sentence)
-		if (testLastChar) {
-			const testResult = firstHalf + ellipsisSymbol + testLastChar + secondHalf;
-			targetElement.textContent = testResult;
-			if (
-				targetElement.scrollWidth <= targetElement.clientWidth &&
-				targetElement.scrollHeight <= targetElement.clientHeight
-			) {
-				secondHalf = testLastChar + secondHalf;
+		// Try adding from the end first
+		if (lastIndex >= 0 && lastIndex < originalTextLength) {
+			const testSecond = originalText[lastIndex] + bestSecondHalf;
+			setTextContent(targetElement, bestFirstHalf, ellipsisSymbol, testSecond);
+			if (!checkOverflow()) {
+				bestSecondHalf = testSecond;
 				lastIndex--;
-				result = testResult;
 				added = true;
 			}
 		}
 
-		// If we couldn't add from end, try from start
-		if (!added && testFirstChar) {
-			const testResult =
-				firstHalf + testFirstChar + ellipsisSymbol + secondHalf;
-			targetElement.textContent = testResult;
-			if (
-				targetElement.scrollWidth <= targetElement.clientWidth &&
-				targetElement.scrollHeight <= targetElement.clientHeight
-			) {
-				firstHalf = firstHalf + testFirstChar;
+		// Try adding from the start
+		if (!added && firstIndex < originalTextLength) {
+			const testFirst = bestFirstHalf + originalText[firstIndex];
+			setTextContent(targetElement, testFirst, ellipsisSymbol, bestSecondHalf);
+			if (!checkOverflow()) {
+				bestFirstHalf = testFirst;
 				firstIndex++;
-				result = testResult;
 				added = true;
 			}
 		}
@@ -165,7 +165,12 @@ const truncateText = ({
 		canAddMore = added;
 	}
 
-	return result;
+	return {
+		firstHalf: bestFirstHalf,
+		secondHalf: bestSecondHalf,
+		ellipsisSymbol,
+		truncated: true,
+	};
 };
 
 export const truncateOnResize = ({
@@ -182,7 +187,7 @@ export const truncateOnResize = ({
 
 	// Helper that performs a single truncation pass.
 	const runTruncate = () => {
-		const truncatedText = truncateText({
+		const result = truncateText({
 			boundingElement,
 			targetElement,
 			/* Below checks provide run-time guarantees */
@@ -192,8 +197,18 @@ export const truncateOnResize = ({
 			lineLimit: typeof lineLimit === "number" ? lineLimit : 1,
 		});
 
-		// Directly update the originalText in the DOM
-		targetElement.textContent = truncatedText;
+		// Update the DOM with ellipsis wrapped in a styleable span
+		if (result.truncated) {
+			setHtmlContent(
+				targetElement,
+				result.firstHalf,
+				result.ellipsisSymbol,
+				result.secondHalf,
+			);
+		} else {
+			// No truncation needed, just set plain text
+			targetElement.textContent = result.firstHalf;
+		}
 	};
 
 	// Run once immediately so the element is correct on initial render/layout.

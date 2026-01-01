@@ -9,26 +9,40 @@ const canvasContext =
 		? document.createElement("canvas").getContext("2d")
 		: null;
 
+// Cache for measured widths to avoid repeated DOM access
+const measureCache = new Map<string, number>();
+
 export const setFontWidthMap = (customMap: FontWidthMap) => {
 	fontWidthMap = customMap;
 };
 
-// Measure character width using Canvas API for accuracy
+// Measure character width using Canvas API
 const measureCharacterWidth = (
 	character: string,
 	fontFamily: string,
 	fontSize: number,
 ): number => {
+	const cacheKey = `${character}|${fontFamily}|${fontSize}`;
+	const cached = measureCache.get(cacheKey);
+	if (cached !== undefined) {
+		return cached;
+	}
+
 	if (!canvasContext) {
 		// Fallback for non-browser environments
 		return fontSize * 0.6; // rough approximation
 	}
 
-	canvasContext.font = `${fontSize}px ${fontFamily}`;
-	// Measure the character twice to account for font kerning and spacing
-	const metrics = canvasContext.measureText(character + character);
-	// Use the precise width without rounding to maximize space usage
-	return metrics.width / 2;
+	// Normalize font family for canvas
+	const normalizedFont = fontFamily.replace(/['"]/g, "");
+	canvasContext.font = `${fontSize}px ${normalizedFont}, sans-serif`;
+
+	// Measure the character
+	const metrics = canvasContext.measureText(character);
+	const width = metrics.width;
+
+	measureCache.set(cacheKey, width);
+	return width;
 };
 
 export const getCharacterWidth = (

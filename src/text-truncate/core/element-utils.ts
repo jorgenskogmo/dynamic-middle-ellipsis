@@ -2,7 +2,7 @@ export const getElementProperties = (targetElement: Element) => {
 	const style = window.getComputedStyle(targetElement);
 
 	const fontSize = Number.parseFloat(style.fontSize);
-	const fontFamily = style.fontFamily.split(",")[0];
+	const fontFamily = style.fontFamily.split(",")[0].replace(/['"]/g, "").trim();
 
 	const marginXWidth =
 		Number.parseFloat(style.marginLeft) + Number.parseFloat(style.marginRight);
@@ -43,7 +43,7 @@ export const getSiblingWidth = (targetElement: Element): number => {
 		} else {
 			const props = getElementProperties(child);
 			// Only add if we got a valid width (not NaN)
-			if (!isNaN(props.totalWidth)) {
+			if (!Number.isNaN(props.totalWidth)) {
 				width += props.totalWidth;
 			}
 		}

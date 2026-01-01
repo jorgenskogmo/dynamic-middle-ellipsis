@@ -8,6 +8,21 @@ import createMiddleEllipsisUtils from "./core/index";
  *
  * @slot - Default slot for text content to be truncated
  *
+ * @attr {string} tooltip - Custom tooltip text. If not provided, defaults to
+ *   the full un-truncated text content.
+ *
+ * @csspart ellipsis - The ellipsis symbol element, allowing custom styling
+ *   for positioning, color, font, etc. Useful for adjusting vertical alignment
+ *   of special characters or adding visual emphasis.
+ *
+ * @remarks
+ * This component uses IntersectionObserver to defer truncation calculations
+ * until the element is visible in the viewport. This provides excellent
+ * performance for large lists and tables with hundreds of truncated items.
+ *
+ * The `tooltip` attribute is automatically set to the full text content unless
+ * explicitly provided by the user. This enables native browser tooltips on hover.
+ *
  * @example Basic usage
  * ```html
  * <text-truncate>
@@ -21,6 +36,22 @@ import createMiddleEllipsisUtils from "./core/index";
  *   Multi-line text with custom ellipsis
  * </text-truncate>
  * ```
+ *
+ * @example Custom tooltip text
+ * ```html
+ * <text-truncate tooltip="Click to view full path">
+ *   /Users/johndoe/documents/very-long-file-path.txt
+ * </text-truncate>
+ * ```
+ *
+ * @example Styling the ellipsis symbol
+ * ```css
+ * text-truncate::part(ellipsis) {
+ *   position: relative;
+ *   top: -2px;
+ *   color: #666;
+ * }
+ * ```
  */
 @customElement("text-truncate")
 export class TextTruncate extends LitElement {
@@ -29,6 +60,7 @@ export class TextTruncate extends LitElement {
 			display: block;
 			max-width: 100%;
 			box-sizing: border-box;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 		}
 		
 		.content {
@@ -54,16 +86,47 @@ export class TextTruncate extends LitElement {
 			text-overflow: ellipsis;
 			overflow: hidden;
 		}
+
+		/* Default ellipsis styles - can be overridden via ::part(ellipsis) */
+		[part="ellipsis"] {
+			display: inline;
+			vertical-align: baseline;
+		}
 	`;
 
+	/**
+	 * Determines the truncation variant to use.
+	 * - "middle": Truncates text in the middle with an ellipsis.
+	 * - "end": Truncates text at the end using CSS text-overflow.
+	 *
+	 * @default "middle"
+	 */
 	@property({ type: String })
 	variant: "middle" | "end" = "middle";
 
+	/**
+	 * Symbol to use for the ellipsis when truncating text.
+	 *
+	 * @default "…"
+	 */
 	@property({ type: String, attribute: "ellipsis-symbol" })
 	ellipsisSymbol = "…";
 
+	/**
+	 * Number of lines to display before truncating.
+	 * Supports multi-line truncation.
+	 *
+	 * @default 1
+	 */
 	@property({ type: Number, attribute: "line-limit" })
 	lineLimit = 1;
+
+	/**
+	 * Custom tooltip text to show on hover.
+	 * If not provided, defaults to the full un-truncated text content.
+	 */
+	@property({ type: String, attribute: "tooltip", reflect: true })
+	tooltip = "";
 
 	@query(".content")
 	private contentElement!: HTMLDivElement;
@@ -71,11 +134,15 @@ export class TextTruncate extends LitElement {
 	private cleanupTruncate?: () => void;
 	private slotContent = "";
 	private slotObserver?: MutationObserver;
+	private intersectionObserver?: IntersectionObserver;
+	private hasBeenVisible = false;
+	private pendingTruncation = false;
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
 		this.cleanupTruncate?.();
 		this.slotObserver?.disconnect();
+		this.intersectionObserver?.disconnect();
 	}
 
 	private handleSlotChange(e: Event) {
@@ -89,6 +156,10 @@ export class TextTruncate extends LitElement {
 		// Only update if content actually changed
 		if (newContent !== this.slotContent) {
 			this.slotContent = newContent;
+			// Set tooltip to full text if not explicitly provided by user
+			if (!this.hasAttribute("tooltip") || this.tooltip === "") {
+				this.tooltip = newContent;
+			}
 			this.cleanupTruncate?.();
 			this.setupTruncation();
 		}
@@ -102,6 +173,10 @@ export class TextTruncate extends LitElement {
 				.trim();
 			if (updatedContent !== this.slotContent) {
 				this.slotContent = updatedContent;
+				// Update tooltip to full text if not explicitly provided by user
+				if (!this.hasAttribute("tooltip") || this.tooltip === "") {
+					this.tooltip = updatedContent;
+				}
 				this.cleanupTruncate?.();
 				this.setupTruncation();
 			}
@@ -121,6 +196,18 @@ export class TextTruncate extends LitElement {
 
 	private setupTruncation() {
 		if (!this.contentElement || !this.slotContent) return;
+
+		// If not yet visible, defer truncation until element becomes visible
+		// This dramatically improves performance for large lists/tables
+		if (!this.hasBeenVisible) {
+			this.pendingTruncation = true;
+			this.setupIntersectionObserver();
+			// Show original text with CSS overflow as placeholder
+			this.contentElement.textContent = this.slotContent;
+			return;
+		}
+
+		this.pendingTruncation = false;
 
 		// Set max-height for multiline
 		if (this.lineLimit > 1) {
@@ -159,6 +246,37 @@ export class TextTruncate extends LitElement {
 		this.contentElement.textContent = this.slotContent;
 	}
 
+	private setupIntersectionObserver() {
+		// Already observing or already been visible
+		if (this.intersectionObserver || this.hasBeenVisible) return;
+
+		this.intersectionObserver = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						this.hasBeenVisible = true;
+						this.intersectionObserver?.disconnect();
+						this.intersectionObserver = undefined;
+
+						// Now run the actual truncation if pending
+						if (this.pendingTruncation) {
+							requestAnimationFrame(() => {
+								this.setupTruncation();
+							});
+						}
+						break;
+					}
+				}
+			},
+			{
+				// Start truncating slightly before element enters viewport
+				rootMargin: "100px",
+			},
+		);
+
+		this.intersectionObserver.observe(this);
+	}
+
 	private setupMiddleTruncation() {
 		const truncateOnResize = createMiddleEllipsisUtils();
 
@@ -174,6 +292,19 @@ export class TextTruncate extends LitElement {
 	}
 
 	protected firstUpdated() {
+		// Check if element is already visible in viewport
+		// If so, truncate immediately to avoid visual jump
+		const rect = this.getBoundingClientRect();
+		const isInViewport =
+			rect.top < window.innerHeight + 100 &&
+			rect.bottom > -100 &&
+			rect.left < window.innerWidth + 100 &&
+			rect.right > -100;
+
+		if (isInViewport) {
+			this.hasBeenVisible = true;
+		}
+
 		// Use requestAnimationFrame to ensure DOM is fully rendered with correct widths
 		requestAnimationFrame(() => {
 			this.setupTruncation();
