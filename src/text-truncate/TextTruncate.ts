@@ -34,6 +34,7 @@ export class TextTruncate extends LitElement {
 		.content {
 			white-space: nowrap;
 			overflow: hidden;
+			line-height: 1.2;
 		}
 		
 		.content.multiline {
